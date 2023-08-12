@@ -26,4 +26,6 @@ const create = async (req, res) => {
   }
 };
 
+// Next script
+
 module.exports = { legals, create };
