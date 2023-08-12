@@ -26,4 +26,17 @@ const create = async (req, res) => {
   }
 };
 
-module.exports = { legals, create };
+const show = async (req, res) => {
+  try {
+    const response = await Legal.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
+
+module.exports = { legals, create, show };
