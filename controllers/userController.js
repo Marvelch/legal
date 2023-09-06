@@ -29,8 +29,9 @@ const create = async (req, res) => {
     });
     res.status(201).json({ msg: "successful registration" });
   } catch (error) {
-    res.status(400).json({ msg: error.message });
     console.log(error);
+    res.json(error);
+    // res.status(400).json({ msg: error.message });
   }
 };
 
@@ -152,8 +153,34 @@ const login = async (req, res) => {
 
     res.status(200).json({ msg: accessToken });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    // res.status(500).json({ msg: error.message });
+    console.log(error);
   }
 };
 
-module.exports = { users, create, show, update, destroy, login };
+const logout = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.status(404).json({ data: "Not Found" });
+  const users = await User.findOne({
+    where: {
+      refreshToken: refreshToken,
+    },
+  });
+  if (!users) return res.status(404).json({ data: "Not Found" });
+  try {
+    User.update(
+      { refreshToken: null },
+      {
+        where: {
+          id: users.id,
+        },
+      }
+    );
+    res.clearCookie("refreshToken");
+    return res.status(200).json({ data: "success" });
+  } catch (error) {
+    return res.status(500).json({ data: error.message });
+  }
+};
+
+module.exports = { users, create, show, update, destroy, login, logout };
